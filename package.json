@@ -1,0 +1,10 @@
+{
+  "name": "alahlam-web-store",
+  "private": true,
+  "version": "1.0.0",
+  "description": "نسخة الويب المستقلة لمتجر الأحلام للتوكيلات التجارية",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "node server.cjs"
+  }
+}
