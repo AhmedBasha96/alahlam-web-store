@@ -1272,7 +1272,7 @@ h1, h2, h3, h4, h5, h6, button, input, select, textarea, span, p, a {
 }
 
 /* Header row inside tabs */
-.admin-tab-content-area > div:first-child {
+.admin-tab-content-area > div:first-child:not(.admin-2col-grid) {
   display: flex !important;
   justify-content: space-between !important;
   align-items: center !important;
@@ -4256,7 +4256,7 @@ button[title*="إعادة الطلب"] {
   }
 
   /* Top Subheader of Chat Tab */
-  .admin-tab-content-area > div:first-child {
+  .admin-chat-header {
     background: #0f172a !important;
     border: 1px solid #1e293b !important;
     border-radius: 16px !important;
@@ -4267,8 +4267,33 @@ button[title*="إعادة الطلب"] {
     align-items: center !important;
   }
 
-  .admin-tab-content-area > div:first-child > div:last-child {
-    display: none !important;
+  /* Brands & Categories 2-Column Responsive Layout */
+  .admin-tab-content-area > .admin-2col-grid,
+  .admin-2col-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 18px !important;
+    width: 100% !important;
+    align-items: start !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-tab-content-area > .admin-2col-grid > div,
+  .admin-2col-grid > div {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  @media (max-width: 768px) {
+    .admin-tab-content-area > .admin-2col-grid,
+    .admin-2col-grid {
+      grid-template-columns: 1fr !important;
+    }
   }
 }
 
