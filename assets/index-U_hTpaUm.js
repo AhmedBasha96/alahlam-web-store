@@ -1,4 +1,373 @@
-window.sendWarehouseWhatsApp=function(e){if(!e)return;try{const t=e.items||[],n=t.map((s,i)=>{const o=s.quantity||1;return`${i+1}️⃣ *${s.name}*\n   📦 الكمية: *${o}*`}).join("\n\n"),r=t.reduce((s,i)=>s+(Number(i.quantity)||0),0),a=e.createdAt?new Date(e.createdAt).toLocaleString("ar-EG",{dateStyle:"short",timeStyle:"short"}):new Date().toLocaleDateString("ar-EG"),c=e.pricingTier==="wholesale"?"تاجر جملة 🚛":e.pricingTier==="semiWholesale"?"تاجر نص جملة 📦":"عميل قطاعي 🛒",d=e.paymentMethod==="cod"?"عند الاستلام (كاش)":"دفع إلكتروني",l=(Number(e.totalAmount)||0).toLocaleString(),u=`🏢 *شركة الأحلام للتوكيلات التجارية*\n📦 *إذن صرف وتجهيز بضاعة للمخزن* 📦\n----------------------------------------\n📋 *رقم الإذن / الطلب:* #${e.id}\n📅 *تاريخ الطلب:* ${a}\n----------------------------------------\n👤 *العميل:* ${e.customerName||"عميل"} (${c})\n📞 *هاتف العميل:* ${e.phone||"-"}\n📍 *عنوان التسليم:* ${e.address||"استلام من مقر التوكيل"}\n${e.driverId?`🛵 *المندوب المكلف:* ${e.driverId}\n`:""}💵 *طريقة التحصيل:* ${d}\n----------------------------------------\n🛒 *الأصناف المطلوب تجهيزها وصرفها بالمخزن:*\n\n${n||"لا توجد أصناف مسجلة"}\n\n----------------------------------------\n📊 *إجمالي الأصناف:* ${t.length} صنف\n📦 *إجمالي الوحدات المطلوبة:* ${r} وحدة\n💵 *إجمالي قيمة الفاتورة:* ${l} ج.م\n${e.notes?`📝 *ملاحظات:* ${e.notes}\n----------------------------------------\n`:""}⚠️ *توجيهات أمين المخزن:*\n• فحص الصلاحية والتغليف السليم للكراتين قبل الخروج.\n• مطابقة الباركود والكميات المصروفة بدقة.\n• تسليم الطلبية والتوقيع على إذن الصرف مع المندوب.`,m=localStorage.getItem("alahlam_wh_whatsapp")||"",p=prompt("📦 إرسال إذن تجهيز للمخزن عبر WhatsApp:\n\nأدخل رقم هاتف المخزن (أو اضغط OK للإرسال المباشر لأي محادثة أو جروب):",m);if(p===null)return;let f=p.trim().replace(/[^0-9]/g,""),h="";if(f){f.startsWith("01")&&f.length===11&&(f="2"+f),localStorage.setItem("alahlam_wh_whatsapp",p.trim()),h=`https://api.whatsapp.com/send?phone=${f}&text=${encodeURIComponent(u)}`}else h=`https://api.whatsapp.com/send?text=${encodeURIComponent(u)}`;window.open(h,"_blank")}catch(s){console.error("Error generating warehouse dispatch slip:",s),alert("حدث خطأ أثناء تجهيز إذن الواتساب")}};(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const l of s)if(l.type==="childList")for(const o of l.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function r(s){const l={};return s.integrity&&(l.integrity=s.integrity),s.referrerPolicy&&(l.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?l.credentials="include":s.crossOrigin==="anonymous"?l.credentials="omit":l.credentials="same-origin",l}function i(s){if(s.ep)return;s.ep=!0;const l=r(s);fetch(s.href,l)}})();function fm(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}var tp={exports:{}},Gs={},np={exports:{}},ce={};/**
+
+window.generateWarehouseSlipCanvas=function(order){
+  const items=order.items||[];
+  const rowHeight=44,headerHeight=240,summaryHeight=280;
+  const canvasHeight=Math.max(800,headerHeight+(items.length*rowHeight)+summaryHeight);
+  const canvasWidth=850;
+  const canvas=document.createElement("canvas");
+  canvas.width=canvasWidth;
+  canvas.height=canvasHeight;
+  const ctx=canvas.getContext("2d");
+
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(0,0,canvasWidth,canvasHeight);
+
+  ctx.strokeStyle="#059669";
+  ctx.lineWidth=4;
+  ctx.strokeRect(16,16,canvasWidth-32,canvasHeight-32);
+
+  ctx.strokeStyle="#e2e8f0";
+  ctx.lineWidth=1.5;
+  ctx.strokeRect(22,22,canvasWidth-44,canvasHeight-44);
+
+  const gradient=ctx.createLinearGradient(0,24,canvasWidth,140);
+  gradient.addColorStop(0,"#064e3b");
+  gradient.addColorStop(0.5,"#059669");
+  gradient.addColorStop(1,"#047857");
+  ctx.fillStyle=gradient;
+  ctx.fillRect(24,24,canvasWidth-48,110);
+
+  ctx.direction="rtl";
+  ctx.textAlign="center";
+
+  ctx.fillStyle="#fef08a";
+  ctx.font="bold 22px Cairo, Tahoma, sans-serif";
+  ctx.fillText("شركة الأحلام للتوكيلات التجارية",canvasWidth/2,60);
+
+  ctx.fillStyle="#ffffff";
+  ctx.font="900 28px Cairo, Tahoma, sans-serif";
+  ctx.fillText("📦 إذن صرف وتجهيز بضاعة للمخزن 📦",canvasWidth/2,100);
+
+  ctx.fillStyle="#d1fae5";
+  ctx.font="14px Cairo, Tahoma, sans-serif";
+  ctx.fillText("نظام إدارة المستودعات والطلبيات المركزي",canvasWidth/2,124);
+
+  ctx.textAlign="right";
+  const boxY=148,boxH=92;
+
+  ctx.fillStyle="#f8fafc";
+  ctx.strokeStyle="#cbd5e1";
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(canvasWidth/2+10,boxY,(canvasWidth-68)/2,boxH,8);
+  else ctx.rect(canvasWidth/2+10,boxY,(canvasWidth-68)/2,boxH);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle="#0f172a";
+  ctx.font="bold 15px Cairo, Tahoma, sans-serif";
+  ctx.fillText("رقم الإذن: #"+order.id,canvasWidth-36,boxY+28);
+
+  ctx.font="14px Cairo, Tahoma, sans-serif";
+  ctx.fillStyle="#475569";
+  const dateStr=order.createdAt?new Date(order.createdAt).toLocaleString("ar-EG",{dateStyle:"short",timeStyle:"short"}):new Date().toLocaleDateString("ar-EG");
+  ctx.fillText("تاريخ الطلب: "+dateStr,canvasWidth-36,boxY+54);
+
+  const tier=order.pricingTier==="wholesale"?"تاجر جملة 🚛":order.pricingTier==="semiWholesale"?"تاجر نص جملة 📦":"عميل قطاعي 🛒";
+  ctx.fillText("فئة العميل: "+tier,canvasWidth-36,boxY+78);
+
+  ctx.fillStyle="#f8fafc";
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(34,boxY,(canvasWidth-68)/2,boxH,8);
+  else ctx.rect(34,boxY,(canvasWidth-68)/2,boxH);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle="#0f172a";
+  ctx.font="bold 15px Cairo, Tahoma, sans-serif";
+  ctx.fillText("اسم العميل: "+(order.customerName||"عميل"),canvasWidth/2-10,boxY+28);
+
+  ctx.font="14px Cairo, Tahoma, sans-serif";
+  ctx.fillStyle="#475569";
+  ctx.fillText("رقم الهاتف: "+(order.phone||"-"),canvasWidth/2-10,boxY+54);
+  ctx.fillText("العنوان: "+(order.address||"استلام من المقر"),canvasWidth/2-10,boxY+78);
+
+  const tableY=256;
+  ctx.fillStyle="#0f172a";
+  ctx.fillRect(34,tableY,canvasWidth-68,38);
+
+  ctx.fillStyle="#ffffff";
+  ctx.font="bold 15px Cairo, Tahoma, sans-serif";
+  ctx.textAlign="center";
+  ctx.fillText("م",canvasWidth-60,tableY+25);
+  ctx.fillText("الكمية المطلوبة",canvasWidth-480,tableY+25);
+  ctx.fillText("سعر الوحدة",canvasWidth-610,tableY+25);
+  ctx.fillText("الإجمالي",canvasWidth-730,tableY+25);
+
+  ctx.textAlign="right";
+  ctx.fillText("الصنف والمواصفات",canvasWidth-100,tableY+25);
+
+  let currentY=tableY+38;
+  items.forEach((it,idx)=>{
+    ctx.fillStyle=idx%2===0?"#ffffff":"#f8fafc";
+    ctx.fillRect(34,currentY,canvasWidth-68,rowHeight);
+
+    ctx.strokeStyle="#e2e8f0";
+    ctx.lineWidth=1;
+    ctx.strokeRect(34,currentY,canvasWidth-68,rowHeight);
+
+    ctx.fillStyle="#0f172a";
+    ctx.font="bold 14px Cairo, Tahoma, sans-serif";
+
+    ctx.textAlign="center";
+    ctx.fillText(""+(idx+1),canvasWidth-60,currentY+28);
+
+    ctx.textAlign="right";
+    const cleanName=(it.name||"").substring(0,42);
+    ctx.fillText(cleanName,canvasWidth-100,currentY+28);
+
+    ctx.textAlign="center";
+    ctx.fillStyle="#059669";
+    ctx.font="900 16px Cairo, Tahoma, sans-serif";
+    ctx.fillText((it.quantity||1)+" وحدة",canvasWidth-480,currentY+28);
+
+    ctx.fillStyle="#475569";
+    ctx.font="14px Cairo, Tahoma, sans-serif";
+    ctx.fillText((it.price?it.price+" ج.م":"-"),canvasWidth-610,currentY+28);
+
+    ctx.fillStyle="#0f172a";
+    ctx.font="bold 14px Cairo, Tahoma, sans-serif";
+    ctx.fillText((it.price&&it.quantity?(it.price*it.quantity)+" ج.م":"-"),canvasWidth-730,currentY+28);
+
+    currentY+=rowHeight;
+  });
+
+  currentY+=16;
+  ctx.fillStyle="#ecfdf5";
+  ctx.strokeStyle="#10b981";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(34,currentY,canvasWidth-68,80,10);
+  else ctx.rect(34,currentY,canvasWidth-68,80);
+  ctx.fill();
+  ctx.stroke();
+
+  const totalQty=items.reduce((s,it)=>s+(Number(it.quantity)||0),0);
+  ctx.textAlign="right";
+  ctx.fillStyle="#065f46";
+  ctx.font="bold 16px Cairo, Tahoma, sans-serif";
+  ctx.fillText("إجمالي الأصناف: "+items.length+" أصناف",canvasWidth-60,currentY+36);
+  ctx.fillText("إجمالي الكمية للصرف: "+totalQty+" وحدة / كرتونة",canvasWidth-60,currentY+64);
+
+  ctx.textAlign="left";
+  ctx.fillStyle="#047857";
+  ctx.font="900 24px Cairo, Tahoma, sans-serif";
+  ctx.fillText("الإجمالي: "+(Number(order.totalAmount)||0).toLocaleString()+" ج.م",60,currentY+48);
+
+  currentY+=100;
+  ctx.textAlign="center";
+
+  ctx.fillStyle="#fffbeb";
+  ctx.strokeStyle="#fcd34d";
+  ctx.lineWidth=1;
+  ctx.beginPath();
+  if(ctx.roundRect)ctx.roundRect(34,currentY,canvasWidth-68,50,8);
+  else ctx.rect(34,currentY,canvasWidth-68,50);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle="#92400e";
+  ctx.font="bold 13px Cairo, Tahoma, sans-serif";
+  ctx.fillText("⚠️ تعليمات المخزن: مراجعة الصلاحيات والباركود والتأكد من سلامة التغليف قبل تسليم الطلب للمندوب",canvasWidth/2,currentY+30);
+
+  currentY+=70;
+  ctx.fillStyle="#334155";
+  ctx.font="bold 14px Cairo, Tahoma, sans-serif";
+  ctx.fillText("توقيع أمين المخزن",canvasWidth-150,currentY);
+  ctx.strokeStyle="#94a3b8";
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  ctx.moveTo(canvasWidth-240,currentY+35);
+  ctx.lineTo(canvasWidth-60,currentY+35);
+  ctx.stroke();
+
+  ctx.setLineDash([]);
+  ctx.strokeStyle="#059669";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.arc(canvasWidth/2,currentY+20,36,0,Math.PI*2);
+  ctx.stroke();
+  ctx.fillStyle="#059669";
+  ctx.font="bold 11px Cairo, Tahoma, sans-serif";
+  ctx.fillText("شركة الأحلام",canvasWidth/2,currentY+16);
+  ctx.fillText("إدارة المخازن",canvasWidth/2,currentY+32);
+
+  ctx.fillStyle="#334155";
+  ctx.font="bold 14px Cairo, Tahoma, sans-serif";
+  ctx.fillText("توقيع مستلم الطلب / المندوب",160,currentY);
+  ctx.strokeStyle="#94a3b8";
+  ctx.setLineDash([4,4]);
+  ctx.beginPath();
+  ctx.moveTo(70,currentY+35);
+  ctx.lineTo(250,currentY+35);
+  ctx.stroke();
+
+  return canvas;
+};
+
+window.showSlipModal=function(order,dataUrl,fileName,waUrl,copied,blob){
+  const existing=document.getElementById("warehouse-slip-modal");
+  if(existing)existing.remove();
+
+  const modal=document.createElement("div");
+  modal.id="warehouse-slip-modal";
+  modal.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999999;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px);";
+
+  modal.innerHTML=`
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:22px;max-width:580px;width:100%;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 25px 50px -12px rgba(0,0,0,0.7);overflow:hidden;direction:rtl;font-family:Cairo,sans-serif;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid #334155;background:#1e293b;">
+        <div style="font-weight:900;font-size:1.1rem;color:white;display:flex;align-items:center;gap:8px;">
+          <span>📦</span>
+          <span>صورة إذن صرف وتجهيز المخزن (#${order.id})</span>
+        </div>
+        <button id="close-wh-modal" style="background:#334155;border:none;color:#cbd5e1;font-size:1.1rem;cursor:pointer;padding:6px 12px;border-radius:10px;font-weight:900;">✕</button>
+      </div>
+      <div style="padding:18px 20px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px;">
+        <div style="background:rgba(16, 185, 129, 0.15);border:1.5px solid #10b981;border-radius:14px;padding:14px 16px;color:#d1fae5;font-size:0.92rem;line-height:1.6;font-weight:700;">
+          <div style="display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:900;color:#34d399;margin-bottom:4px;">
+            <span>📸</span>
+            <span>تم تجهيز صورة الإذن بالكامل!</span>
+          </div>
+          ${copied ? '📋 <strong>تم نسخ الصورة للحافظة تلقائياً!</strong> بمجرد فتح محادثة الواتساب اضغط <kbd style="background:#064e3b;padding:2px 6px;border-radius:6px;border:1px solid #10b981;">Ctrl + V</kbd> (لصق) لإرسال الصورة مباشرة.' : '📥 يمكنك سحب الصورة المرفقة أو نسخها وإرسالها في الواتساب.'}
+        </div>
+        <div style="text-align:center;background:#020617;padding:12px;border-radius:16px;border:1px solid #1e293b;">
+          <img src="${dataUrl}" style="max-height:290px;max-width:100%;border-radius:10px;box-shadow:0 6px 16px rgba(0,0,0,0.5);object-fit:contain;cursor:zoom-in;" title="اضغط لفتح الصورة كاملة" onclick="window.open('${dataUrl}','_blank')">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          <button id="btn-open-wa" style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:white;border:none;border-radius:14px;padding:13px;font-weight:900;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(16,185,129,0.35);">
+            <span>📲</span>
+            <span>فتح الواتساب (Ctrl + V)</span>
+          </button>
+          <button id="btn-copy-img" style="background:#0284c7;color:white;border:none;border-radius:14px;padding:13px;font-weight:900;font-size:0.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(2,132,199,0.35);">
+            <span>📋</span>
+            <span id="copy-btn-text">نسخ الصورة مجدداً</span>
+          </button>
+        </div>
+        <a href="${dataUrl}" download="${fileName}" style="background:#1e293b;border:1px solid #334155;color:#e2e8f0;text-decoration:none;border-radius:14px;padding:11px;font-weight:800;font-size:0.88rem;display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
+          <span>📥</span>
+          <span>تحميل الصورة على الجهاز (${fileName})</span>
+        </a>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  document.getElementById("close-wh-modal").onclick=()=>modal.remove();
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
+
+  document.getElementById("btn-open-wa").onclick=()=>{
+    window.open(waUrl,"_blank");
+  };
+
+  document.getElementById("btn-copy-img").onclick=async()=>{
+    try{
+      if(navigator.clipboard&&window.ClipboardItem&&blob){
+        await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);
+        const txt=document.getElementById("copy-btn-text");
+        txt.textContent="✓ تم النسخ بنجاح!";
+        setTimeout(()=>{txt.textContent="نسخ الصورة مجدداً";},2500);
+      }
+    }catch(e){
+      alert("يرجى الضغط على زر فتح الواتساب ولصق الصورة بـ Ctrl+V أو سحب الصورة");
+    }
+  };
+};
+
+window.sendWarehouseWhatsApp=async function(order){
+  if(!order)return;
+  try{
+    const canvas=window.generateWarehouseSlipCanvas(order);
+    const dataUrl=canvas.toDataURL("image/png");
+    const blob=await new Promise(r=>canvas.toBlob(r,"image/png"));
+    const fileName="اذن-مخزن-"+order.id+".png";
+
+    // Try Web Share API (mobile devices)
+    try{
+      const file=new File([blob],fileName,{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({
+          files:[file],
+          title:"إذن مخزن #"+order.id,
+          text:"📦 إذن صرف وتجهيز بضاعة للمخزن - طلب رقم #"+order.id
+        });
+        return;
+      }
+    }catch(err){
+      if(err.name!=="AbortError")console.log("Web share not completed:",err);
+    }
+
+    // Ask for WhatsApp phone or group
+    const savedWh=localStorage.getItem("alahlam_wh_whatsapp")||"";
+    const phoneInput=prompt("📦 إرسال صورة إذن المخزن عبر WhatsApp:\n\nأدخل رقم هاتف المخزن (أو اضغط OK لفتح الواتساب واختيار المحادثة/الجروب):",savedWh);
+    if(phoneInput===null)return;
+
+    let targetPhone=phoneInput.trim().replace(/[^0-9]/g,"");
+    if(targetPhone){
+      if(targetPhone.startsWith("01")&&targetPhone.length===11)targetPhone="2"+targetPhone;
+      localStorage.setItem("alahlam_wh_whatsapp",phoneInput.trim());
+    }
+
+    // Attempt direct send via backend if WhatsApp bot is connected
+    let sentDirectly=false;
+    if(targetPhone){
+      try{
+        const resp=await fetch("/api/whatsapp/send-image",{
+          method:"POST",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({
+            phone:targetPhone,
+            imageBase64:dataUrl,
+            caption:"📦 إذن صرف وتجهيز بضاعة للمخزن - طلب #"+order.id
+          })
+        });
+        const resJson=await resp.json();
+        if(resJson&&resJson.success){
+          sentDirectly=true;
+          alert("🎉 تم إرسال صورة إذن المخزن بنجاح وتلقائياً عبر واتساب إلى: "+targetPhone);
+        }
+      }catch(e){
+        console.log("Backend whatsapp direct send skipped:",e);
+      }
+    }
+
+    // Copy to clipboard
+    let copied=false;
+    try{
+      if(navigator.clipboard&&window.ClipboardItem){
+        await navigator.clipboard.write([new ClipboardItem({"image/png":blob})]);
+        copied=true;
+      }
+    }catch(e){
+      console.warn("Clipboard auto-copy failed:",e);
+    }
+
+    // Trigger auto-download
+    try{
+      const link=document.createElement("a");
+      link.download=fileName;
+      link.href=dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }catch(e){}
+
+    const waUrl=targetPhone?"https://web.whatsapp.com/send?phone="+targetPhone:"https://web.whatsapp.com/";
+
+    if(!sentDirectly){
+      window.open(waUrl,"_blank");
+    }
+
+    // Show modal preview
+    window.showSlipModal(order,dataUrl,fileName,waUrl,copied,blob);
+
+  }catch(err){
+    console.error("Error sending warehouse slip:",err);
+    alert("حدث خطأ أثناء إنشاء صورة إذن المخزن: "+err.message);
+  }
+};
+
+(function(){const t=document.createElement("link").relList;if(t&&t.supports&&t.supports("modulepreload"))return;for(const s of document.querySelectorAll('link[rel="modulepreload"]'))i(s);new MutationObserver(s=>{for(const l of s)if(l.type==="childList")for(const o of l.addedNodes)o.tagName==="LINK"&&o.rel==="modulepreload"&&i(o)}).observe(document,{childList:!0,subtree:!0});function r(s){const l={};return s.integrity&&(l.integrity=s.integrity),s.referrerPolicy&&(l.referrerPolicy=s.referrerPolicy),s.crossOrigin==="use-credentials"?l.credentials="include":s.crossOrigin==="anonymous"?l.credentials="omit":l.credentials="same-origin",l}function i(s){if(s.ep)return;s.ep=!0;const l=r(s);fetch(s.href,l)}})();function fm(e){return e&&e.__esModule&&Object.prototype.hasOwnProperty.call(e,"default")?e.default:e}var tp={exports:{}},Gs={},np={exports:{}},ce={};/**
  * @license React
  * react.production.min.js
  *
