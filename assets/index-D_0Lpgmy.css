@@ -4371,3 +4371,115 @@ strike {
   opacity: 1 !important;
   border-color: #334155 !important;
 }
+
+
+/* ========================================================
+   Enhanced Luxury Brand Chips with High-Def Logo Avatars
+   ======================================================== */
+.brand-chip.brand-chip-enhanced {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  height: 42px !important;
+  padding: 3px 14px 3px 5px !important;
+  border-radius: 9999px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  color: #1e293b !important;
+  font-family: 'Alexandria', 'Cairo', sans-serif !important;
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+  cursor: pointer !important;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  flex-shrink: 0 !important;
+}
+
+.brand-chip.brand-chip-enhanced:hover {
+  transform: translateY(-2px) !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.15) !important;
+}
+
+.brand-chip.brand-chip-enhanced.active {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+  box-shadow: 0 6px 18px rgba(16, 185, 129, 0.38) !important;
+  transform: translateY(-1px) !important;
+}
+
+.brand-chip-avatar {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+  padding: 2px !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.brand-chip-avatar.all-avatar {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+  border-color: #cbd5e1 !important;
+}
+
+.brand-chip.brand-chip-enhanced.active .brand-chip-avatar.all-avatar {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(255, 255, 255, 0.6) !important;
+  color: #ffffff !important;
+}
+
+.brand-chip-avatar.avatar-active {
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.brand-chip-avatar .brand-chip-img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 50% !important;
+  object-fit: contain !important;
+  display: block !important;
+  background: #ffffff !important;
+}
+
+.brand-chip-name {
+  font-size: 0.82rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.2px !important;
+}
+
+/* Dark mode theme support */
+[data-theme="dark"] .brand-chip.brand-chip-enhanced {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] .brand-chip-avatar {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .brand-chip-avatar.all-avatar {
+  background: #334155 !important;
+  border-color: #475569 !important;
+}
+
+[data-theme="dark"] .brand-chip.brand-chip-enhanced.active {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
+  color: #ffffff !important;
+  border-color: #10b981 !important;
+}
